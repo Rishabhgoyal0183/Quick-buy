@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Payment Failed — QuickBuy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: 'DM Sans', sans-serif;
+          background: #0a0a0f; color: #f0f0f5;
+          min-height: 100vh;
+          display: flex; align-items: center; justify-content: center; padding: 24px;
+        }
+        .card {
+          background: #111118; border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 24px; padding: 44px 40px;
+          max-width: 400px; width: 100%; text-align: center;
+        }
+        .icon {
+          width: 64px; height: 64px;
+          background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          margin: 0 auto 20px;
+        }
+        h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        p  { font-size: 14px; color: #888899; margin-bottom: 24px; line-height: 1.6; }
+        .reason {
+          background: rgba(239,68,68,0.08);
+          border: 1px solid rgba(239,68,68,0.2);
+          border-radius: 10px; padding: 10px 14px;
+          font-size: 13px; color: #fca5a5;
+          margin-bottom: 24px; display: none;
+        }
+        .btn {
+          display: block; width: 100%; padding: 14px;
+          background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+          color: #fff; border: none; border-radius: 12px;
+          font-size: 15px; font-weight: 500; cursor: pointer;
+          text-decoration: none; text-align: center;
+        }
+        .btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+             stroke="#f87171" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+    </div>
+    <h2>Payment Failed</h2>
+    <p>Your payment could not be processed. Please try again with a different payment method.</p>
+    <div class="reason" id="reason-box"></div>
+    <a href="/index.html" class="btn">Try Again</a>
+</div>
+
+<script>
+    // Read the failure reason from URL query param
+    // e.g. /failure.html?reason=Your+card+was+declined
+    const reason = new URLSearchParams(window.location.search).get('reason');
+    if (reason) {
+      const box = document.getElementById('reason-box');
+      box.textContent = reason;
+      box.style.display = 'block';
+    }
+</script>
+</body>
+</html>

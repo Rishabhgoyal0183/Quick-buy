@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>QuickBuy — Tech Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+          rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+          --bg:        #0a0a0f;
+          --bg2:       #111118;
+          --bg3:       #1a1a24;
+          --border:    rgba(255,255,255,0.07);
+          --accent:    #4f6ef7;
+          --accent2:   #7c3aed;
+          --text:      #f0f0f5;
+          --muted:     #888899;
+          --card-bg:   #13131c;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+          font-family: 'DM Sans', sans-serif;
+          background: var(--bg);
+          color: var(--text);
+          min-height: 100vh;
+          overflow-x: hidden;
+        }
+
+        /* ── NAVBAR ──────────────────────────────── */
+        nav {
+          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 18px 40px;
+          background: rgba(10,10,15,0.85);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid var(--border);
+        }
+        .nav-logo {
+          font-family: 'Syne', sans-serif;
+          font-weight: 800; font-size: 20px;
+          letter-spacing: -0.5px;
+          background: linear-gradient(135deg, #4f6ef7, #a78bfa);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .nav-tag {
+          font-size: 12px; color: var(--muted);
+          border: 1px solid var(--border);
+          padding: 4px 12px; border-radius: 20px;
+        }
+
+        /* ── HERO ────────────────────────────────── */
+        .hero {
+          min-height: 100vh;
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          text-align: center;
+          padding: 120px 24px 80px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        /* background grid */
+        .hero::before {
+          content: '';
+          position: absolute; inset: 0;
+          background-image:
+            linear-gradient(rgba(79,110,247,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(79,110,247,0.04) 1px, transparent 1px);
+          background-size: 48px 48px;
+          mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+        }
+
+        /* glow orbs */
+        .hero::after {
+          content: '';
+          position: absolute;
+          width: 600px; height: 600px;
+          background: radial-gradient(circle, rgba(79,110,247,0.12) 0%, transparent 70%);
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+        }
+
+        .hero-badge {
+          display: inline-flex; align-items: center; gap: 6px;
+          border: 1px solid rgba(79,110,247,0.3);
+          background: rgba(79,110,247,0.08);
+          color: #a5b4fc;
+          font-size: 12px; font-weight: 500; letter-spacing: 0.5px;
+          padding: 6px 14px; border-radius: 20px;
+          margin-bottom: 28px;
+          position: relative; z-index: 1;
+          animation: fadeUp 0.5s ease both;
+        }
+        .hero-badge span { width:6px; height:6px; border-radius:50%; background:#4f6ef7; display:inline-block; }
+
+        .hero h1 {
+          font-family: 'Syne', sans-serif;
+          font-size: clamp(42px, 7vw, 80px);
+          font-weight: 800; line-height: 1.05;
+          letter-spacing: -2px;
+          margin-bottom: 20px;
+          position: relative; z-index: 1;
+          animation: fadeUp 0.5s 0.1s ease both;
+        }
+        .hero h1 em {
+          font-style: normal;
+          background: linear-gradient(135deg, #4f6ef7 0%, #a78bfa 50%, #f472b6 100%);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+          font-size: 17px; color: var(--muted); max-width: 520px;
+          line-height: 1.7; margin-bottom: 36px;
+          position: relative; z-index: 1;
+          animation: fadeUp 0.5s 0.2s ease both;
+        }
+
+        .hero-stats {
+          display: flex; gap: 40px; justify-content: center;
+          position: relative; z-index: 1;
+          animation: fadeUp 0.5s 0.3s ease both;
+        }
+        .stat { text-align: center; }
+        .stat-num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: var(--text); }
+        .stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+        .hero-scroll {
+          position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+          display: flex; flex-direction: column; align-items: center; gap: 6px;
+          color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+          animation: bounce 2s infinite;
+          z-index: 1;
+        }
+        .hero-scroll::before {
+          content: ''; width: 1px; height: 40px;
+          background: linear-gradient(to bottom, transparent, var(--muted));
+        }
+
+        /* ── HOW IT WORKS ────────────────────────── */
+        .section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+
+        .section-label {
+          font-size: 11px; font-weight: 600; letter-spacing: 2px;
+          text-transform: uppercase; color: #4f6ef7;
+          margin-bottom: 12px;
+        }
+        .section-title {
+          font-family: 'Syne', sans-serif;
+          font-size: clamp(28px, 4vw, 40px);
+          font-weight: 700; letter-spacing: -1px;
+          margin-bottom: 48px; color: var(--text);
+        }
+
+        .steps-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 16px;
+        }
+        .step-card {
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          padding: 24px;
+          position: relative;
+          transition: border-color 0.2s, transform 0.2s;
+        }
+        .step-card:hover { border-color: rgba(79,110,247,0.3); transform: translateY(-2px); }
+        .step-num {
+          width: 36px; height: 36px; border-radius: 10px;
+          background: rgba(79,110,247,0.12);
+          border: 1px solid rgba(79,110,247,0.2);
+          color: #818cf8;
+          font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+          display: flex; align-items: center; justify-content: center;
+          margin-bottom: 14px;
+        }
+        .step-card h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .step-card p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+        /* ── PRODUCTS ────────────────────────────── */
+        .products-section { padding: 0 24px 100px; max-width: 1100px; margin: 0 auto; }
+
+        .products-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+          gap: 20px;
+        }
+
+        .product-card {
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          overflow: hidden;
+          transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+          cursor: default;
+        }
+        .product-card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(79,110,247,0.25);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(79,110,247,0.1);
+        }
+
+        .product-img {
+          width: 100%; height: 190px; object-fit: cover;
+          background: var(--bg3);
+          display: block;
+        }
+
+        .product-body { padding: 18px; }
+        .product-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+        .product-desc { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 18px; min-height: 42px; }
+
+        .product-footer { display: flex; align-items: center; justify-content: space-between; }
+        .product-price {
+          font-family: 'Syne', sans-serif;
+          font-size: 20px; font-weight: 700; color: var(--text);
+        }
+        .product-price small { font-size: 11px; font-weight: 400; color: var(--muted); display: block; }
+
+        .btn-buy {
+          background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+          color: #fff; border: none;
+          padding: 10px 22px; border-radius: 10px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px; font-weight: 500;
+          cursor: pointer;
+          transition: opacity 0.2s, transform 0.15s;
+          white-space: nowrap;
+        }
+        .btn-buy:hover { opacity: 0.9; transform: scale(1.03); }
+        .btn-buy:active { transform: scale(0.98); }
+
+        /* ── SKELETON LOADING ────────────────────── */
+        .skeleton {
+          background: linear-gradient(90deg, var(--bg3) 25%, #1f1f2e 50%, var(--bg3) 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.4s infinite;
+          border-radius: 8px;
+        }
+        .skel-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+        .skel-img  { width: 100%; height: 190px; }
+        .skel-body { padding: 18px; }
+        .skel-line { height: 14px; margin-bottom: 10px; }
+        .skel-line.w80 { width: 80%; }
+        .skel-line.w60 { width: 60%; }
+        .skel-line.w40 { width: 40%; }
+
+        /* ── MODAL ───────────────────────────────── */
+        .modal-overlay {
+          position: fixed; inset: 0; z-index: 200;
+          background: rgba(0,0,0,0.75);
+          backdrop-filter: blur(6px);
+          display: flex; align-items: center; justify-content: center;
+          padding: 24px;
+          opacity: 0; visibility: hidden;
+          transition: opacity 0.2s, visibility 0.2s;
+        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+
+        .modal {
+          background: var(--bg2);
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          padding: 32px;
+          width: 100%; max-width: 420px;
+          transform: translateY(16px);
+          transition: transform 0.25s;
+        }
+        .modal-overlay.open .modal { transform: translateY(0); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+        .modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+        .modal-close {
+          width: 32px; height: 32px; border-radius: 8px;
+          background: var(--bg3); border: 1px solid var(--border);
+          color: var(--muted); cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 18px; line-height: 1;
+          transition: color 0.15s;
+        }
+        .modal-close:hover { color: var(--text); }
+
+        .modal-product {
+          display: flex; align-items: center; gap: 12px;
+          background: var(--bg3); border: 1px solid var(--border);
+          border-radius: 12px; padding: 12px 14px;
+          margin-bottom: 24px;
+        }
+        .modal-product-name { font-size: 14px; font-weight: 500; }
+        .modal-product-price { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: #818cf8; margin-top: 2px; }
+
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.3px; }
+        input[type="text"], input[type="email"] {
+          width: 100%;
+          background: var(--bg3);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          padding: 11px 14px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px; color: var(--text);
+          outline: none;
+          transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        input[type="text"]:focus, input[type="email"]:focus {
+          border-color: rgba(79,110,247,0.5);
+          box-shadow: 0 0 0 3px rgba(79,110,247,0.1);
+        }
+        input::placeholder { color: #444458; }
+
+        .btn-pay-now {
+          width: 100%; padding: 14px;
+          background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+          color: #fff; border: none; border-radius: 12px;
+          font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+          cursor: pointer; margin-top: 4px;
+          transition: opacity 0.2s, transform 0.15s;
+        }
+        .btn-pay-now:hover { opacity: 0.9; }
+        .btn-pay-now:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .modal-error {
+          background: rgba(239,68,68,0.1);
+          border: 1px solid rgba(239,68,68,0.25);
+          color: #fca5a5;
+          border-radius: 8px; padding: 10px 12px;
+          font-size: 13px; margin-bottom: 14px;
+          display: none;
+        }
+
+        .secure-line {
+          text-align: center; font-size: 11px; color: var(--muted);
+          margin-top: 12px;
+        }
+
+        /* ── FOOTER ──────────────────────────────── */
+        footer {
+          border-top: 1px solid var(--border);
+          padding: 28px 40px;
+          display: flex; justify-content: space-between; align-items: center;
+          color: var(--muted); font-size: 13px;
+        }
+        footer strong { color: var(--text); font-family: 'Syne', sans-serif; }
+
+        /* ── ANIMATIONS ──────────────────────────── */
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+          from { background-position: 200% 0; }
+          to   { background-position: -200% 0; }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50%       { transform: translateX(-50%) translateY(-6px); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Razorpay JS SDK — must load before we call new Razorpay() -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- ── NAVBAR ───────────────────────────────── -->
+<nav>
+    <div class="nav-logo">QuickBuy</div>
+    <div class="nav-tag">Powered by Razorpay · Spring Boot</div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────── -->
+<section class="hero">
+    <div class="hero-badge"><span></span> Payment Gateway Demo Project</div>
+    <h1>Buy <em>direct.</em><br/>Pay instant.</h1>
+    <p>A Spring Boot + Razorpay demo. Browse products, click Buy Now, and experience a complete payment flow — no cart,
+        no accounts, no friction.</p>
+    <div class="hero-stats">
+        <div class="stat">
+            <div class="stat-num" id="stat-products">—</div>
+            <div class="stat-label">Products</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">₹0</div>
+            <div class="stat-label">Real money charged</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Test mode</div>
+        </div>
+    </div>
+    <div class="hero-scroll">scroll</div>
+</section>
+
+<!-- ── HOW IT WORKS ──────────────────────────── -->
+<div class="section">
+    <div class="section-label">How it works</div>
+    <div class="section-title">Simple 3-step flow</div>
+    <div class="steps-grid">
+        <div class="step-card">
+            <div class="step-num">01</div>
+            <h3>Pick a product</h3>
+            <p>Browse the product list below. Prices are in INR. No account or login needed.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">02</div>
+            <h3>Enter your details</h3>
+            <p>Just your name and email. No address, no card details stored on this server.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">03</div>
+            <h3>Pay via Razorpay</h3>
+            <p>Razorpay popup opens. Use a test card to simulate payment. No real money.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">04</div>
+            <h3>Order confirmed</h3>
+            <p>Backend verifies the payment signature and marks the order as PAID in the DB.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ── PRODUCTS ──────────────────────────────── -->
+<div class="products-section">
+    <div class="section-label">Store</div>
+    <div class="section-title">Available products</div>
+    <div class="products-grid" id="products-grid">
+
+        <!-- Skeleton placeholders shown while fetching -->
+        <div class="skel-card">
+            <div class="skeleton skel-img"></div>
+            <div class="skel-body">
+                <div class="skeleton skel-line w80"></div>
+                <div class="skeleton skel-line w60"></div>
+                <div class="skeleton skel-line w40" style="margin-top:18px;"></div>
+            </div>
+        </div>
+        <div class="skel-card">
+            <div class="skeleton skel-img"></div>
+            <div class="skel-body">
+                <div class="skeleton skel-line w80"></div>
+                <div class="skeleton skel-line w60"></div>
+                <div class="skeleton skel-line w40" style="margin-top:18px;"></div>
+            </div>
+        </div>
+        <div class="skel-card">
+            <div class="skeleton skel-img"></div>
+            <div class="skel-body">
+                <div class="skeleton skel-line w80"></div>
+                <div class="skeleton skel-line w60"></div>
+                <div class="skeleton skel-line w40" style="margin-top:18px;"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── FOOTER ────────────────────────────────── -->
+<footer>
+    <div><strong>QuickBuy</strong> — Spring Boot Payment Demo</div>
+    <div>Test mode · No real transactions</div>
+</footer>
+
+<!-- ── CHECKOUT MODAL ────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">Complete your order</div>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+
+        <!-- Product summary shown inside modal -->
+        <div class="modal-product">
+            <div>
+                <div class="modal-product-name" id="modal-product-name">—</div>
+                <div class="modal-product-price" id="modal-product-price">—</div>
+            </div>
+        </div>
+
+        <div class="modal-error" id="modal-error"></div>
+
+        <div class="form-group">
+            <label for="customer-name">Full Name</label>
+            <input type="text" id="customer-name" placeholder="Your name"/>
+        </div>
+        <div class="form-group">
+            <label for="customer-email">Email Address</label>
+            <input type="email" id="customer-email" placeholder="you@example.com"/>
+        </div>
+
+        <button class="btn-pay-now" id="pay-btn" onclick="initPayment()">
+            Proceed to Pay
+        </button>
+        <div class="secure-line">Secured by Razorpay · Card details never touch this server</div>
+    </div>
+</div>
+
+<!-- ── JAVASCRIPT ─────────────────────────────── -->
+<script>
+    // ── State ──────────────────────────────────────────────────────────────────
+    let selectedProduct = null;  // holds { id, name, price } when user clicks Buy Now
+
+    // ── Fetch products from Spring Boot API ────────────────────────────────────
+    async function loadProducts() {
+      try {
+        const res      = await fetch('/api/products');
+        const products = await res.json();
+
+        // Update hero stat
+        document.getElementById('stat-products').textContent = products.length;
+
+        const grid = document.getElementById('products-grid');
+
+        if (!products.length) {
+          grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;">No products found. Check your database seed.</p>';
+          return;
+        }
+
+        grid.innerHTML = products.map(p => `
+          <div class="product-card">
+            <img
+              class="product-img"
+              src="${p.imageUrl}"
+              alt="${p.name}"
+              onerror="this.style.background='#1a1a2e';this.style.opacity='0.4'"
+            />
+            <div class="product-body">
+              <div class="product-name">${p.name}</div>
+              <div class="product-desc">${p.description}</div>
+              <div class="product-footer">
+                <div class="product-price">
+                  ₹${Number(p.price).toLocaleString('en-IN')}
+                  <small>incl. taxes</small>
+                </div>
+                <button class="btn-buy" onclick="openModal(${p.id}, '${escHtml(p.name)}', ${p.price})">
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        document.getElementById('products-grid').innerHTML =
+          '<p style="color:#fca5a5;grid-column:1/-1;">Failed to load products — is the Spring Boot server running on port 8080?</p>';
+      }
+    }
+
+    // ── Modal open/close ───────────────────────────────────────────────────────
+    function openModal(id, name, price) {
+      selectedProduct = { id, name, price };
+      document.getElementById('modal-product-name').textContent  = name;
+      document.getElementById('modal-product-price').textContent = '₹' + Number(price).toLocaleString('en-IN');
+      document.getElementById('modal-error').style.display = 'none';
+      document.getElementById('customer-name').value  = '';
+      document.getElementById('customer-email').value = '';
+      document.getElementById('pay-btn').disabled     = false;
+      document.getElementById('pay-btn').textContent  = 'Proceed to Pay';
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+      selectedProduct = null;
+    }
+
+    function handleOverlayClick(e) {
+      // close if user clicks the dark backdrop, not the modal card itself
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    }
+
+    // close modal on Escape key
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // ── Main payment flow ──────────────────────────────────────────────────────
+    async function initPayment() {
+      const name     = document.getElementById('customer-name').value.trim();
+      const email    = document.getElementById('customer-email').value.trim();
+      const payBtn   = document.getElementById('pay-btn');
+      const errorDiv = document.getElementById('modal-error');
+
+      // Basic validation
+      if (!name) { showError('Please enter your name.'); return; }
+      if (!email || !email.includes('@')) { showError('Please enter a valid email.'); return; }
+
+      errorDiv.style.display = 'none';
+      payBtn.disabled = true;
+      payBtn.textContent = 'Creating order...';
+
+      try {
+        // ── Step 1: Call backend to create order ───────────────────────────────
+        // Backend calls Razorpay SDK, saves Order(PENDING) in DB, returns order details
+        const orderRes = await fetch('/api/orders/create', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId:     selectedProduct.id,
+            customerName:  name,
+            customerEmail: email
+          })
+        });
+
+        if (!orderRes.ok) {
+          const err = await orderRes.json();
+          throw new Error(err.message || 'Failed to create order');
+        }
+
+        const order = await orderRes.json();
+        // order = { orderId, razorpayOrderId, amount, currency, keyId, productName, ... }
+
+        payBtn.textContent = 'Opening payment...';
+
+        // ── Step 2: Open Razorpay popup using the order details ────────────────
+        const options = {
+          key:         order.keyId,           // rzp_test_xxx  — your public key
+          amount:      order.amount,          // in paise — Razorpay requires this
+          currency:    order.currency,        // "INR"
+          name:        'QuickBuy',
+          description: order.productName,
+          order_id:    order.razorpayOrderId, // order_xxx — links popup to Razorpay order
+
+          prefill: {
+            name:  order.customerName,
+            email: order.customerEmail
+          },
+
+          theme: { color: '#4f6ef7' },
+
+          // ── Step 3: Payment done inside popup ─────────────────────────────
+          // Razorpay calls this with 3 values after successful payment
+          handler: function(response) {
+            // response.razorpay_order_id
+            // response.razorpay_payment_id
+            // response.razorpay_signature
+            // → send these to backend /api/payment/verify (build this next)
+
+            // For now: store in sessionStorage so success page can show them
+            sessionStorage.setItem('paymentResponse', JSON.stringify({
+              razorpayOrderId:   response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+              orderId:           order.orderId,
+              productName:       order.productName
+            }));
+
+            // Redirect to success page
+            // success.html will call /api/payment/verify using the stored values
+            window.location.href = '/success.html';
+          },
+
+          modal: {
+            // User closed the popup without paying
+            ondismiss: function() {
+              payBtn.disabled = false;
+              payBtn.textContent = 'Proceed to Pay';
+              showError('Payment cancelled. You can try again.');
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+    // Payment failed inside popup (e.g. wrong OTP too many times)
+    rzp.on('payment.failed', function(response) {
+         console.log(response);
+         window.location.href = '/failure.html?reason='
+        + encodeURIComponent(response.error.description);
+    });
+
+        rzp.open();
+
+      } catch (err) {
+        showError(err.message || 'Something went wrong. Please try again.');
+        payBtn.disabled = false;
+        payBtn.textContent = 'Proceed to Pay';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('modal-error');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    // Prevent XSS from product names
+    function escHtml(str) {
+      return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // ── Boot ───────────────────────────────────────────────────────────────────
+    loadProducts();
+</script>
+</body>
+</html>

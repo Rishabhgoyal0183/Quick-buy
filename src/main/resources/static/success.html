@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Payment Successful — QuickBuy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+          --bg: #0a0a0f; --bg2: #111118; --bg3: #1a1a24;
+          --border: rgba(255,255,255,0.07);
+          --text: #f0f0f5; --muted: #888899;
+        }
+        body {
+          font-family: 'DM Sans', sans-serif;
+          background: var(--bg); color: var(--text);
+          min-height: 100vh;
+          display: flex; align-items: center; justify-content: center;
+          padding: 24px;
+        }
+
+        .card {
+          background: #111118;
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 24px;
+          padding: 44px 40px;
+          max-width: 440px; width: 100%;
+          text-align: center;
+          animation: fadeUp 0.4s ease both;
+        }
+
+        /* spinning ring while verifying */
+        .spinner {
+          width: 64px; height: 64px;
+          border: 2px solid rgba(79,110,247,0.15);
+          border-top-color: #4f6ef7;
+          border-radius: 50%;
+          margin: 0 auto 24px;
+          animation: spin 0.8s linear infinite;
+        }
+
+        /* success tick */
+        .icon-wrap {
+          width: 64px; height: 64px;
+          background: rgba(34,197,94,0.1);
+          border: 1px solid rgba(34,197,94,0.2);
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          margin: 0 auto 20px;
+          display: none;
+        }
+        .icon-wrap svg { width: 28px; height: 28px; color: #4ade80; }
+
+        /* failed state */
+        .icon-fail {
+          width: 64px; height: 64px;
+          background: rgba(239,68,68,0.1);
+          border: 1px solid rgba(239,68,68,0.2);
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          margin: 0 auto 20px;
+          display: none;
+        }
+
+        h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .subtitle { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+
+        .detail-box {
+          background: var(--bg3);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          padding: 16px 18px;
+          text-align: left;
+          margin-bottom: 24px;
+        }
+        .detail-row {
+          display: flex; justify-content: space-between;
+          font-size: 13px; padding: 5px 0;
+          border-bottom: 1px solid var(--border);
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: var(--muted); }
+        .detail-value { font-weight: 500; color: var(--text); text-align: right; max-width: 60%; word-break: break-all; }
+        .detail-value.success { color: #4ade80; }
+
+        .payment-id-box {
+          background: var(--bg3);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          padding: 10px 14px;
+          font-size: 11px; font-family: monospace;
+          color: var(--muted); word-break: break-all;
+          text-align: left; margin-bottom: 24px;
+        }
+        .payment-id-box span { color: #818cf8; }
+
+        .btn-home {
+          display: block; width: 100%;
+          background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+          color: #fff; border: none; border-radius: 12px;
+          padding: 14px; font-family: 'DM Sans', sans-serif;
+          font-size: 15px; font-weight: 500; cursor: pointer;
+          text-decoration: none; text-align: center;
+          transition: opacity 0.2s;
+        }
+        .btn-home:hover { opacity: 0.9; }
+
+        .verifying-text { font-size: 14px; color: var(--muted); margin-bottom: 8px; }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div class="card" id="card">
+
+    <!-- STATE: Verifying (default) -->
+    <div id="state-verifying">
+        <div class="spinner"></div>
+        <h2>Verifying payment...</h2>
+        <p class="subtitle">Please wait while we confirm your payment with Razorpay.</p>
+    </div>
+
+    <!-- STATE: Success (hidden until verify API responds) -->
+    <div id="state-success" style="display:none;">
+        <div class="icon-wrap" id="icon-success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6L9 17l-5-5"/>
+            </svg>
+        </div>
+        <h2>Payment Confirmed</h2>
+        <p class="subtitle">Your order has been placed. Thank you for using QuickBuy!</p>
+
+        <div class="detail-box">
+            <div class="detail-row">
+                <span class="detail-label">Product</span>
+                <span class="detail-value" id="d-product">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Order ID</span>
+                <span class="detail-value" id="d-order-id">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="detail-value success">PAID</span>
+            </div>
+        </div>
+
+        <div class="payment-id-box">
+            Payment ID: <span id="d-payment-id">—</span>
+        </div>
+
+        <a href="/index.html" class="btn-home">Back to Store</a>
+    </div>
+
+    <!-- STATE: Failed -->
+    <div id="state-failed" style="display:none;">
+        <div class="icon-fail" id="icon-fail">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="28" height="28">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </div>
+        <h2 style="color:#f87171;">Verification Failed</h2>
+        <p class="subtitle" id="fail-reason">The payment could not be verified.</p>
+        <a href="/index.html" class="btn-home" style="margin-top:8px;">Try Again</a>
+    </div>
+
+</div>
+
+<script>
+    // ── Read what Razorpay gave us (stored by index.html before redirect) ──────
+    const stored = sessionStorage.getItem('paymentResponse');
+
+    if (!stored) {
+      // Landed here directly without going through payment — redirect back
+      window.location.href = '/index.html';
+    } else {
+      const data = JSON.parse(stored);
+      sessionStorage.removeItem('paymentResponse'); // clean up
+
+      // ── Call backend verify API ──────────────────────────────────────────────
+      // This is the next API you will build: POST /api/payment/verify
+      // It verifies the HMAC-SHA256 signature and updates order status to PAID
+      verifyPayment(data);
+    }
+
+    async function verifyPayment(data) {
+      try {
+        const res = await fetch('/api/payment/verify', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpayOrderId:   data.razorpayOrderId,
+            razorpayPaymentId: data.razorpayPaymentId,
+            razorpaySignature: data.razorpaySignature
+          })
+        });
+
+        const result = await res.json();
+        console.log('Verification result:', result.status);
+
+        if (result.status === 'SUCCESS') {
+          showSuccess(data, result);
+        } else {
+          showFailed(result.message || 'Signature verification failed.');
+        }
+
+      } catch (err) {
+        // /api/payment/verify not built yet — show a temporary message
+        showFailed('Verify API not built yet. This is the next step! (' + err.message + ')');
+      }
+    }
+
+    function showSuccess(data, result) {
+      document.getElementById('state-verifying').style.display = 'none';
+      document.getElementById('state-success').style.display   = 'block';
+      document.getElementById('icon-success').style.display    = 'flex';
+
+      document.getElementById('d-product').textContent    = data.productName  || '—';
+      document.getElementById('d-order-id').textContent   = result.orderId    || data.orderId || '—';
+      document.getElementById('d-payment-id').textContent = data.razorpayPaymentId || '—';
+    }
+
+    function showFailed(reason) {
+      document.getElementById('state-verifying').style.display = 'none';
+      document.getElementById('state-failed').style.display    = 'block';
+      document.getElementById('icon-fail').style.display       = 'flex';
+      document.getElementById('fail-reason').textContent       = reason;
+    }
+</script>
+</body>
+</html>
