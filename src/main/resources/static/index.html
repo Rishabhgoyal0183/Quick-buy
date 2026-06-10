@@ -668,10 +668,25 @@
         const rzp = new Razorpay(options);
     // Payment failed inside popup (e.g. wrong OTP too many times)
     rzp.on('payment.failed', function(response) {
-         console.log(response);
-         window.location.href = '/failure.html?reason='
-        + encodeURIComponent(response.error.description);
+    console.log('Payment failed:', response.error);
+
+    // Call backend to update order → FAILED and save payment record
+    fetch('/api/payment/failure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            razorpayOrderId:   response.error.metadata.order_id,
+            razorpayPaymentId: response.error.metadata.payment_id,
+            failureReason:     response.error.description
+        })
+    })
+    .catch(err => console.error('Failed to update order status:', err))
+    .finally(() => {
+        // Redirect regardless — never block user on this call
+        window.location.href = '/failure.html?reason='
+            + encodeURIComponent(response.error.description);
     });
+});
 
         rzp.open();
 

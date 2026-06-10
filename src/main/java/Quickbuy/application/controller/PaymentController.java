@@ -1,7 +1,7 @@
 package Quickbuy.application.controller;
 
+import Quickbuy.application.dto.PaymentFailureRequest;
 import Quickbuy.application.dto.PaymentVerifyRequest;
-import Quickbuy.application.dto.VerifyPaymentResponse;
 import Quickbuy.application.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +31,20 @@ public class PaymentController {
 
 
         return ResponseEntity.ok(paymentService.verifyPayment(paymentVerifyRequest));
+    }
+
+    @PostMapping("/failure")
+    public ResponseEntity<String> paymentFailure(@Valid @RequestBody PaymentFailureRequest request,
+                                               BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .reduce((msg1, msg2) -> msg1 + "; " + msg2)
+                    .orElse("Invalid request");
+            return ResponseEntity.badRequest().body(errorMessage);
+
+        }
+        return ResponseEntity.ok(paymentService.markPaymentFailed(request));
     }
 }
