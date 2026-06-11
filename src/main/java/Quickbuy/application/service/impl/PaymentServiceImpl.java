@@ -42,6 +42,12 @@ public class PaymentServiceImpl implements PaymentService {
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid Razorpay Order ID: " + paymentVerifyRequest.getRazorpayOrderId());
                 });
 
+        if (order.getStatus() == Order.Status.PAID) {
+            log.info("Order {} already PAID — skipping duplicate verify", order.getId());
+            return new VerifyPaymentResponse("SUCCESS",
+                    "Payment already verified for this order");
+        }
+
         boolean isVerified = razorpayService.verifySignature(paymentVerifyRequest.getRazorpayOrderId(),
                 paymentVerifyRequest.getRazorpayPaymentId(),
                 paymentVerifyRequest.getRazorpaySignature()

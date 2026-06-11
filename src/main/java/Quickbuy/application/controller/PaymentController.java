@@ -29,7 +29,6 @@ public class PaymentController {
             return ResponseEntity.badRequest().body(errorMessage);
         }
 
-
         return ResponseEntity.ok(paymentService.verifyPayment(paymentVerifyRequest));
     }
 

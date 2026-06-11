@@ -31,14 +31,7 @@ public class RazorpayServiceImpl implements RazorpayService {
     @PostConstruct
     public void initializeClient(){
         try {
-
-            System.out.println(">>> Razorpay Key ID being used: [" + keyId + "]");
-            System.out.println(">>> Razorpay Secret being used: [" + keySecret + "]");
-
             this.razorpayClient = new RazorpayClient(keyId, keySecret);
-
-            System.out.println(">>> Razorpay Key ID being used: [" + keyId + "]");
-            System.out.println(">>> Razorpay Secret being used: [" + keySecret + "]");
         } catch (RazorpayException e) {
             throw new RuntimeException("Failed to initialize Razorpay client", e);
         }

@@ -36,6 +36,12 @@ public class OrderServiceImpl implements OrderService {
                         "Product not found with id: " + request.getProductId()
                 ));
 
+        if (product.getPrice() == null ||
+                product.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Invalid product price, cannot create order"
+            );
+        }
         long amountInPaise = product.getPrice()
                 .multiply(BigDecimal.valueOf(100))
                 .longValue();
