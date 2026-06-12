@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -90,7 +91,14 @@ public class PaymentServiceImpl implements PaymentService {
         // (edge case: success and failure events arrive out of order)
         if (order.getStatus() == Order.Status.PAID) {
             log.warn("Skipping failure update — order {} is already PAID", order.getId());
-            return "Order already marked as PAID, skipping failure update";
+            throw new IllegalArgumentException(
+                    "Order already marked as PAID, skipping failure update");
+        }
+
+        if (Objects.equals(order.getRazorpayOrderId(), request.getRazorpayOrderId())) {
+            log.warn("Skipping failure update — order {} is already marked as FAILED", order.getId());
+            throw new IllegalArgumentException(
+                    "Order already marked as FAILED, skipping failure update");
         }
 
         // Update order status → FAILED

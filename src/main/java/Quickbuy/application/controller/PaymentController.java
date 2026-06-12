@@ -44,6 +44,11 @@ public class PaymentController {
             return ResponseEntity.badRequest().body(errorMessage);
 
         }
-        return ResponseEntity.ok(paymentService.markPaymentFailed(request));
+        try {
+            String response = paymentService.markPaymentFailed(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An error occurred while marking payment as failed: " + e.getMessage());
+        }
     }
 }
