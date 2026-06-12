@@ -1,2 +1,9 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+; This lines indicated that the git will track the .html files but it will ignore the .html files for linguist tool,
+; so that the language of the repository will not be detected as HTML.
+; This is useful when you have a lot of HTML files that are not the main focus of your project,
+; and you want to ensure that the primary language of your repository is detected correctly.
+
+src/main/resources/static/*.html linguist-detectable=false
