@@ -368,4 +368,4 @@ Built as a personal learning project for payment gateway integration with Spring
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available for everyone.
